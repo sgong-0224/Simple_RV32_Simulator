@@ -1,0 +1,45 @@
+#ifndef PLIC_H
+#define PLIC_H
+#include <atomic>
+#include <cstdint>
+#include <optional>
+#include <vector>
+#include <map>
+#include <mutex>
+#include <shared_mutex>
+
+#include "csr.hpp"
+#include "definitions.h"
+
+class UART;
+class PLIC{
+    friend class UART;
+    CSR& csr;
+    std::vector<uint32_t> priority;
+    std::vector<uint32_t> pending;
+    std::vector<uint32_t> enable;
+    uint32_t thresh;
+    uint32_t claim;
+    
+public:
+    std::shared_timed_mutex mtx;
+    PLIC(CSR& csr): 
+        csr(csr),priority(64,0), pending(2,0), enable(2,0), thresh(0), claim(0){}
+    
+    uint32_t read(uint32_t addr);
+    void write(uint32_t data, uint32_t addr);
+    void write_enable(uint32_t data, uint32_t addr);
+    uint32_t select_interrupt();
+    
+    uint32_t read_enable(uint32_t addr);
+    bool get_enable(uint32_t int_id);
+    void set_enable(uint32_t int_id);
+    void clear_enable(uint32_t int_id);
+
+    uint32_t read_pending(uint32_t addr);
+    void write_pending(uint32_t data, uint32_t addr);
+    bool get_pending(uint32_t int_id);
+    void set_pending(uint32_t int_id);
+    void clear_pending(uint32_t int_id);
+};
+#endif
