@@ -15,16 +15,20 @@ class UART;
 class PLIC{
     friend class UART;
     CSR& csr;
-    std::vector<uint32_t> priority;
-    std::vector<uint32_t> pending;
-    std::vector<uint32_t> enable;
+    std::array<uint32_t,64> priority;
+    std::array<uint32_t,2> pending;
+    std::array<uint32_t,2> enable;
     uint32_t thresh;
     uint32_t claim;
     
 public:
     std::shared_timed_mutex mtx;
     PLIC(CSR& csr): 
-        csr(csr),priority(64,0), pending(2,0), enable(2,0), thresh(0), claim(0){}
+        csr(csr), thresh(0), claim(0){
+            priority.fill(0);
+            pending.fill(0);
+            enable.fill(0);
+        }
     
     uint32_t read(uint32_t addr);
     void write(uint32_t data, uint32_t addr);

@@ -1,20 +1,18 @@
 # ifndef CORE_HPP
 # define CORE_HPP
 
-#include <atomic>
+#include <array>
 #include <cassert>
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
 #include <exception>
 #include <functional>
-#include <shared_mutex>
 #include <stdexcept>
 #include <unordered_set>
 #include <iostream>
 #include <iomanip>
 #include <optional>
-#include <condition_variable>
 
 #include "cpu_io.h"
 #include "cpu_exception.h"
@@ -31,7 +29,7 @@ class Core {
 
     // registers
     uint32_t pc = 0;
-    uint32_t regfile[32] = {0};
+    std::array<uint32_t,32> regfile;
     const std::array<std::string, 32> reg_alias = {
         "zero", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
         "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5",
@@ -64,7 +62,7 @@ class Core {
     Exception exception_handler;
 
 public:
-    Core(const std::vector<uint8_t>& code):cpu_io(*this, code, csr){
+    Core(const std::string& code_filename):cpu_io(*this, code_filename, csr){
         instr_exec_func[0b0000011] = [this](uint32_t instruction){this->exec_load(instruction);};
         instr_exec_func[0b0001111] = [this](uint32_t instruction){this->exec_fence(instruction);};
         instr_exec_func[0b0010011] = [this](uint32_t instruction){this->exec_alg_logic_imm(instruction);};
@@ -78,6 +76,7 @@ public:
         instr_exec_func[0b1101111] = [this](uint32_t instruction){this->exec_jal(instruction);};
         instr_exec_func[0b1110011] = [this](uint32_t instruction){this->exec_system(instruction);};
         
+        init_regs();
         init_mode();
         init_stack();
         init_pc();
@@ -92,6 +91,7 @@ public:
     void init_pc()  { pc = MEM_BASE; }
     void init_mode() { mode = MACHINE_MODE; }
     void init_stack() { regfile[2] = MEM_END; }
+    void init_regs() { regfile.fill(0); }
 
     void execute(uint32_t instruction);
     std::optional<uint32_t> fetch();

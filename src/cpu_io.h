@@ -24,8 +24,8 @@ class IO{
     CLINT  clint;
 
 public:
-    IO(Core& core, const std::vector<uint8_t>& code, CSR& csr):
-        core(core),memory(code),plic(csr),uart(plic),clint(csr){}
+    IO(Core& core, const std::string& code_filename, CSR& csr):
+        core(core),memory(code_filename),plic(csr),uart(plic),clint(csr){}
     // access    
     uint32_t load(uint32_t addr, uint8_t width, bool exec=false);
     void store(uint32_t data, uint32_t addr, uint8_t width);

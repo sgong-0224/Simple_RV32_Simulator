@@ -19,15 +19,9 @@ int main(int argc, char** argv)
         usage();
     }else{
         disable_buffered_input();
-        std::fstream binary_in(argv[1],std::ios::binary|std::ios::ate|std::ios::in);
-        std::streamsize size = binary_in.tellg();
-        binary_in.seekg(0, std::ios::beg);
-        std::vector<uint8_t> binary(MEM_SIZE,0);
-        binary_in.read(reinterpret_cast<char*>(binary.data()), size);
-        binary_in.close();
         // init platform
-        auto cpu = Core(binary);
-        
+        auto cpu = Core(argv[1]);
+
         while(true){
             try{
                 auto instruction = cpu.fetch();
