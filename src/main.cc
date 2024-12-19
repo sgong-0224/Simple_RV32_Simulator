@@ -1,12 +1,8 @@
-#include <cstdint>
-#include <fstream>
 #include <iostream>
 #include <optional>
 #include <stdexcept>
-#include <vector>
 
 #include "core.hpp"
-#include "definitions.h"
 
 void usage()
 {
