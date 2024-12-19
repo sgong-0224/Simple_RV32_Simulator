@@ -10,4 +10,4 @@ set(SOURCES
 add_executable(simulator ${SOURCES})
 target_include_directories(simulator PRIVATE src)
 aux_source_directory(src SOURCES)
-add_compile_options(-Ofast -march=native -mavx2 -flto=thin)
+add_compile_options(-O3 -march=native -flto=thin)

@@ -61,7 +61,7 @@ inline int32_t UART::read(int8_t reg)
         cv.wait(lock, [this]() { 
             return (uart_regs[UART_LSR]&MASK_UART_LSR_RX); 
         });
-         if (uart_regs[UART_LSR] & MASK_UART_LSR_RX) {
+        if (uart_regs[UART_LSR] & MASK_UART_LSR_RX) {
             // 接收置位
             uart_regs[UART_LSR] &= ~MASK_UART_LSR_RX;
             return uart_regs[UART_RHR];
