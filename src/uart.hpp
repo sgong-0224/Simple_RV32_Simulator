@@ -26,7 +26,7 @@ public:
             while(!should_stop) {
                 int8_t byte = nonblocking_getchar();
                 if(byte==-1){
-                    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+                    std::this_thread::sleep_for(std::chrono::milliseconds(10));
                     continue;    
                 }
                 {

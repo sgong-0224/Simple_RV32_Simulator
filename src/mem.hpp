@@ -1,8 +1,5 @@
 #include <cstdint>
-#include <stdexcept>
 #include <vector>
-#include <iostream>
-#include <iomanip>
 
 #include "cpu_exception.h"
 #include "definitions.h"

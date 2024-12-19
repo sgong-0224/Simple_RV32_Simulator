@@ -1,5 +1,5 @@
 #include "core.hpp"
-#include <stdexcept>
+
 // instruction runner
 void Core::exec_load(uint32_t instruction)
 {

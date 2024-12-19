@@ -1,7 +1,6 @@
 # ifndef CORE_HPP
 # define CORE_HPP
 
-#include <algorithm>
 #include <atomic>
 #include <cassert>
 #include <cmath>
@@ -99,11 +98,6 @@ public:
     
     // debug
     void dump_registers();
-    
-    // sync & multithreading
-    std::atomic<bool> uart_pending_stop=false;
-    std::condition_variable_any check_shared_free;
-    std::shared_timed_mutex& get_plic_mutex() { return cpu_io.get_plic_mutex(); }
 };
 
 
@@ -121,15 +115,12 @@ inline std::optional<uint32_t> Core::check_pending_interrupt()
     
     auto &mutex = csr.get_mutex();
 
-    // TODO: 时钟中断和外部中断同时启用
+    // 时钟中断
     uint32_t pending = this->csr.read(mie) & this->csr.read(mip);
-    // std::cout << (pending&MASK_MTIP) << '\n';
     if (pending & MASK_MTIP) { 
-       //  std::cout << "trip!\n";
         handling_timer_int = 1;
         this->csr.write(mip, this->csr.read(mip) & ~MASK_MTIP);
         pending = this->csr.read(mie) & this->csr.read(mip);
-        // std::cout << (pending&MASK_MTIP) << '\n';
         return 7;
     }
 
@@ -168,7 +159,6 @@ inline std::optional<uint32_t> Core::fetch()
         exception_handler.handle(*this, 0, 1, pc);
         return std::nullopt;
     }
-    // std::cout << "PC: " << std::hex << pc << " Inst: " << std::setw(8) << std::setfill('0') << inst << "\n";
     return inst;
 }
 

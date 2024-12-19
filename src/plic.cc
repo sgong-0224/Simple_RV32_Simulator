@@ -4,7 +4,6 @@
 
 #include <cstdint>
 #include <cstdio>
-#include <stdexcept>
 
 uint32_t PLIC::read(uint32_t addr)
 {
