@@ -78,7 +78,9 @@ inline void UART::write(int8_t data, int8_t reg)
         return;
     std::unique_lock<std::mutex> lock(mtx);
     if(reg==UART_THR){
-        while((uart_regs[UART_LSR]&MASK_UART_LSR_TX)==0);
+        cv.wait(lock, [this]() { 
+            return (uart_regs[UART_LSR] & MASK_UART_LSR_TX); 
+        });
         uart_regs[UART_LSR]&=~MASK_UART_LSR_TX;
         if(data!=-1)
             putchar(static_cast<char>(data));
