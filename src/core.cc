@@ -38,8 +38,8 @@ void Core::exec_alg_logic_imm(uint32_t instruction)
     uint32_t rs1   = extract_bits(instruction, 19,15);
     uint32_t func3 = extract_bits(instruction, 14,12);
     uint32_t rd    = extract_bits(instruction, 11,7);
-    uint8_t  shamt = extract_bits(instruction, 24, 20);
-    uint8_t  shift = extract_bits(instruction, 31, 25);
+    uint32_t shamt = extract_bits(instruction, 24, 20);
+    uint32_t shift = extract_bits(instruction, 31, 25);
     switch(func3){
         case 0b000:
             regfile[rd] = regfile[rs1] + signed_imm;
@@ -89,7 +89,7 @@ void Core::exec_alg_logic_imm(uint32_t instruction)
 void Core::exec_auipc(uint32_t instruction)
 {
     uint32_t integer = extract_bits(instruction, 31, 12);
-    uint8_t rd = extract_bits(instruction, 11, 7);
+    uint32_t rd = extract_bits(instruction, 11, 7);
     regfile[rd] = (integer << 12) + pc;
     pc += 4;
 }
@@ -231,7 +231,7 @@ void Core::exec_alg_logic(uint32_t instruction)
 void Core::exec_lui(uint32_t instruction)
 {
     uint32_t integer = extract_bits(instruction, 31, 12);
-    uint8_t rd = extract_bits(instruction, 11, 7);
+    uint32_t rd = extract_bits(instruction, 11, 7);
     regfile[rd] = integer << 12;
     pc += 4;
 }
@@ -511,7 +511,7 @@ void Core::exec_system(uint32_t instruction)
         // 恢复权限级别
         mode = (mstat&MASK_MPP) >> 11;
         // MIE 设置为 MPIE
-        uint8_t mpie = (mstat&MASK_MPIE) >> 7;
+        uint32_t mpie = (mstat&MASK_MPIE) >> 7;
         mstat = (mstat&~MASK_MIE)|(mpie<<3);
         // MPIE 设置为 1
         mstat |= MASK_MPIE;
@@ -525,6 +525,10 @@ void Core::exec_system(uint32_t instruction)
     }
     if(func12==0b0001'0000'0101){   // wfi
         while( (csr.read(mstatus)&MASK_MIE) && !(csr.read(mie)&csr.read(mip)));
+        pc += 4;
+        return;
+    }
+    if((func12>>5)==0b0001001){   // sfence.vma: do nothing
         pc += 4;
         return;
     }
@@ -544,7 +548,6 @@ void Core::exec_system(uint32_t instruction)
             exception_handler.handle(*this, 0,11, instruction);
         return;
     }
-    // sfence.vma not necessary, wfi unimpl.
     exec_illegal(instruction);
 }
 void Core::exec_illegal(uint32_t instruction)

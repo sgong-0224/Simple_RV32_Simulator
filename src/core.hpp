@@ -9,7 +9,7 @@
 #include <exception>
 #include <functional>
 #include <stdexcept>
-#include <unordered_set>
+#include <set>
 #include <iostream>
 #include <iomanip>
 #include <optional>
@@ -24,9 +24,6 @@ class Core {
     // control
     uint8_t mode = MACHINE_MODE;
 
-    // atomic
-    std::unordered_set<uint32_t> reserved;
-
     // registers
     uint32_t pc = 0;
     std::array<uint32_t,32> regfile;
@@ -37,6 +34,9 @@ class Core {
         "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6",
     };
     CSR csr;
+
+    // atomic
+    std::set<uint32_t> reserved;
 
     // execution
     std::unordered_map<uint8_t, std::function<void(uint32_t)>> instr_exec_func;

@@ -11,12 +11,13 @@
 
 
 /* ======================= INSTRUCTION DECODE ========================*/
-inline uint32_t extract_bits(uint32_t value, uint8_t high, uint8_t low) 
+__always_inline uint32_t extract_bits(uint32_t value, uint8_t high, uint8_t low) 
 {
     uint32_t mask = ((1u << (high - low + 1)) - 1) << low;
     return (value & mask) >> low;
 }
-inline uint32_t extend_to_u32(uint32_t value, uint8_t original_bits) 
+
+__always_inline uint32_t extend_to_u32(uint32_t value, uint8_t original_bits) 
 {
     bool negative = (value & (1u << (original_bits - 1)));
     if (negative) {
@@ -26,11 +27,11 @@ inline uint32_t extend_to_u32(uint32_t value, uint8_t original_bits)
     return value;
 }
 /* ======================== CSR ADDR UTILITY =========================*/
-inline uint8_t min_priv(uint16_t addr)
+__always_inline uint8_t min_priv(uint16_t addr)
 {
     return extract_bits(addr, 9, 8);
 }
-inline bool is_readonly(uint16_t addr)
+__always_inline bool is_readonly(uint16_t addr)
 {
     return extract_bits(addr, 11, 10)==0b11;
 }

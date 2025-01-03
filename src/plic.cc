@@ -109,24 +109,24 @@ uint32_t PLIC::select_interrupt()
 {
     std::map<uint32_t, uint32_t> int_priority;
     for(uint32_t i=1;i<priority.size();++i)
-        if( priority[i]>=thresh && priority[i]!=0 && get_enable(i) && get_pending(i) )
+        if( priority[i]>=thresh && priority[i]!=0 && get_enable(i) && get_pending(i) ) [[unlikely]]
             int_priority.insert({i,priority[i]});
     
-    if(int_priority.empty())
+    if(int_priority.empty()) [[likely]]
         return 0;
     // 查找最大优先级以及对应的最小ID
     uint32_t max_priority = 0;
     uint32_t min_id_with_max_priority = 64;
     for (const auto& pair : int_priority) {
         if (pair.second > max_priority || 
-            (pair.second == max_priority && pair.first < min_id_with_max_priority)) {
+            (pair.second == max_priority && pair.first < min_id_with_max_priority)) [[unlikely]] {
             max_priority = pair.second;
             min_id_with_max_priority = pair.first;
         }
     }
     // 设置CLAIM, 如果是合法的中断，写mip
     write(min_id_with_max_priority, PLIC_CLAIM);
-    if(min_id_with_max_priority)
+    if(min_id_with_max_priority) [[unlikely]]
         csr.write(mip, csr.read(mip) | MASK_MEIP);
     return min_id_with_max_priority;
 }
